@@ -1,0 +1,54 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /tmp/app.log
+    - /tmp/web.log
+
+setup.template.settings:
+  index.number_of_shards: 1
+
+processors:
+  - dissect:
+      tokenizer: "[%{levelname}] [%{timestamp}] [%{module}] %{message}"
+      when.equals:
+        log.file.path: "/tmp/app.log"
+  - dissect:
+      tokenizer: "[%{timestamp}] %{message}"
+      when.equals:
+        log.file.path: "/tmp/web.log"      
+  - drop_fields:
+      fields:
+        - "message"
+  - rename:
+      fields:
+        - from: "dissect.levelname"
+          to: "levelname"
+        - from: "dissect.module"
+          to: "module"
+        - from: "dissect.message"
+          to: "message"
+      ignore_missing: true
+      fail_on_error: false
+  - timestamp:
+      field: "dissect.timestamp"
+      ignore_missing: true
+      layouts:
+        - "2006-01-02 15:04:05.999"
+      test:
+        - "2020-07-11 21:59:28.999"
+  - drop_fields:
+      fields:
+        - "dissect.timestamp"
+
+output.elasticsearch:
+  hosts: 
+    - elasticsearch:9200
+  protocol: http
+  indices: 
+    - index: "api-server-%{+yyyy.MM.dd}"
+      when.equals:
+        log.file.path: "/tmp/app.log"
+    - index: "webserver-%{+yyyy.MM.dd}"
+      when.equals:
+        log.file.path: "/tmp/web.log"

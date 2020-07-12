@@ -1,0 +1,138 @@
+{
+	"info": {
+		"_postman_id": "300ffde8-eb64-4d8a-97e0-4453c62df050",
+		"name": "Tweets",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Populate database with tweets",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{API_ENDPOINT}}/api/v1/populate",
+					"host": [
+						"{{API_ENDPOINT}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"populate"
+					]
+				},
+				"description": "Populate the database with 100 tweets per each tag: #openbanking, #remediation, #devops, #sre, #microservices, #observability, #oauth, #metrics, #logmonitoring, #opentracing"
+			},
+			"response": []
+		},
+		{
+			"name": "Top 5 users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_ENDPOINT}}/api/v1/users",
+					"host": [
+						"{{API_ENDPOINT}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				},
+				"description": "List the top 5 users with most followers"
+			},
+			"response": []
+		},
+		{
+			"name": "Post count by hour",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_ENDPOINT}}/api/v1/hour ",
+					"host": [
+						"{{API_ENDPOINT}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"hour "
+					]
+				},
+				"description": "Display the total post count per hour in the day"
+			},
+			"response": []
+		},
+		{
+			"name": "Post count per tag, language and country",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_ENDPOINT}}/api/v1/tags",
+					"host": [
+						"{{API_ENDPOINT}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"tags"
+					]
+				},
+				"description": "Display the total post count per tag, country and language"
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_ENDPOINT}}/api/health",
+					"host": [
+						"{{API_ENDPOINT}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				},
+				"description": "Simple health check endpoint"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b68d6fdf-f1e5-43a4-9f40-47c493366f0c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "56cd7639-4c1f-42bd-8c6b-4a968bca86e6",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "362d1c60-9de0-47f9-8270-c2ff594bd69a",
+			"key": "API_ENDPOINT",
+			"value": "http://localhost:8080"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

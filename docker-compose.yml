@@ -1,0 +1,87 @@
+version: "3.8"
+services:
+  database:
+    image: postgres:11.8
+    environment:
+      - POSTGRES_PASSWORD=supersecretpassword
+    expose: 
+      - 5432
+
+  api-server:
+    build: .
+    image: api-server:1.0.0
+    ports:
+      - 8000:8000
+    expose:
+      - 8000
+    env_file: twitter_keys
+    environment:
+      - DATABASE_HOST=database
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=supersecretpassword
+      - DATABASE_PORT=5432
+    volumes: 
+      - ./tweets_collector:/app/tweets_collector:rw
+      - logs:/tmp:rw
+    depends_on: 
+      - database
+
+  haproxy:
+    image: haproxy:2.2.0
+    ports:
+      - 8080:8080
+    expose:
+      - 8404
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.8.0
+    environment: 
+      - output.elasticsearch.hosts=["elasticsearch:9200"]
+    volumes: 
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - logs:/tmp:ro
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    environment: 
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    expose: 
+      - 9200
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.8.0
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on: 
+      - elasticsearch
+
+  prometheus:
+    image: prom/prometheus:v2.19.2
+    ports:
+      - 9090:9090
+    expose:
+      - 9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  blackbox:
+    image: prom/blackbox-exporter:v0.17.0
+    expose:
+      - 9115
+    volumes:
+      - ./blackbox_exporter.yml:/etc/blackbox_exporter/config.yml:ro
+
+  grafana:
+    image: grafana/grafana:7.0.6
+    ports:
+      - 3000:3000
+    
+volumes:
+  logs:
